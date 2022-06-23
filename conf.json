@@ -1,0 +1,52 @@
+{
+    "comm_port": "COM3",
+    "comm_relay_delay": 50,
+    
+    "smu_type": "PCB_board",
+    "smu_port": "USB0::0x0699::0x03B1::C020442::INSTR",
+    "smu_t_step": 0.1,
+    "smu_t_total": 300,
+    "smu_v_profile": [
+        -1,
+        1
+    ],
+    "smu_custom_pars": {
+        "threshold": {
+            "value": "1"
+        },
+        "shift": {
+            "value": "-2"
+        },
+        "trig_ch": {
+            "value": "1"
+        },
+        "data_ch": {
+            "value": "2"
+        }
+    },
+    "smu_v_factor_rec": 0.5,
+    "smu_t_step_rec": 0.1,
+    "smu_t_total_rec": 60,
+    "smu_v_profile_rec": [
+        -1,
+        1
+    ],
+    "smu_recovery_enable": true,
+    
+    "led_port": "COM4",
+    "led_type": "dps_5005",
+
+    "pixel_loop": {
+        "loop": [
+            {
+                "ext": "R0",
+                "inn": "G6",
+                "curr": 0.01030788601320215
+            }
+        ],
+        "err": false,
+        "err_msg": ""
+    },
+    
+    "output_folder": "{timestamp}stce3_pcb_15vRW_600SEC_3"
+}
