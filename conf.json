@@ -2,26 +2,19 @@
     "comm_port": "COM3",
     "comm_relay_delay": 50,
     
-    "smu_type": "PCB_board",
+    "smu_type": "agilent_b29xx",
     "smu_port": "USB0::0x0699::0x03B1::C020442::INSTR",
-    "smu_t_step": 0.1,
     "smu_t_total": 300,
     "smu_v_profile": [
         -1,
         1
     ],
     "smu_custom_pars": {
-        "threshold": {
-            "value": "1"
+        "nplc": {
+            "value": "??"
         },
-        "shift": {
-            "value": "-2"
-        },
-        "trig_ch": {
-            "value": "1"
-        },
-        "data_ch": {
-            "value": "2"
+        "channel": {
+            "value": "??"
         }
     },
     "smu_v_factor_rec": 0.5,
