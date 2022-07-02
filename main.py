@@ -17,13 +17,16 @@ def start_run(configuration):
 import json
  
 # Opening JSON file
-with open('conf.json') as json_file:
+# with open('conf.json') as json_file:
+#     conf = json.load(json_file)
+with open('conf_pulse.json') as json_file:
     conf = json.load(json_file)
 
 conf["Vr_prof"] = -0.5  # Referce voltage
 conf["Vf_prof_arr"] = np.arange(0,1 + 0.1,0.25).tolist()  # Array of forward voltages. Generate array from 0 to 1 (incl) with 0.25 step
 conf["Duty_cycles"] = [0.1,0.25,0.5,0.75] # Array of duty cycles (D). D = Tr / Period. Tr - time for reverse voltage, Period = 100 ms?
 conf["smu_t_step_arr"] = [0.1,0.2,0.3]
+conf["ispulseused"] = True
 
 start_run(conf)
 run.join()

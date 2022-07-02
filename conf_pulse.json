@@ -1,0 +1,91 @@
+{
+    "comm_port": "COM3",
+    "comm_relay_delay": 50,
+    
+    "smu_type": "agilent_b29xx_pulse",
+    "smu_port": "USB0::0x0699::0x03B1::C020442::INSTR",
+    "smu_t_total": 300,
+    "smu_custom_pars": {
+        "nplc": {
+            "value": "0.01"
+        },
+        "channel": {
+            "value": "1"
+        },
+        "pulsedelay": {
+            "value": "0"
+        },
+        "compliance": {
+            "value": "0.01"
+        },
+        "meascurrrange": {
+            "value": "1"
+        },
+        "meashold": {
+            "value": "0"
+        },
+        "measinterval": {
+            "value": "0.1"
+        },
+        "repeat":{
+            "value": 50
+        }
+    },
+    "smu_t_total_rec": 60,
+    "smu_custom_pars_rec": {
+        "nplc": {
+            "value": "0.01"
+        },
+        "channel": {
+            "value": "1"
+        },
+        "pulsedelay": {
+            "value": "0"
+        },
+        "compliance": {
+            "value": "0.01"
+        },
+        "meascurrrange": {
+            "value": "1"
+        },
+        "meashold": {
+            "value": "0"
+        },
+        "measinterval": {
+            "value": "0.1"
+        },
+        "repeat":{
+            "value": 50
+        },
+        "pulsevoltage": {
+            "value": 1
+        },
+        "basevoltage": {
+            "value": -1
+        },
+        "pulsewidth": {
+            "value": 0.5
+        },
+        "period": {
+            "value": 1
+        }
+    },
+    "smu_recovery_enable": true,
+    
+    "led_port": "COM4",
+    "led_type": "dps_5005",
+
+    "pixel_loop": {
+        "loop": [
+            {
+                "ext": "R0",
+                "inn": "G6",
+                "curr": 0.01030788601320215
+            }
+        ],
+        "err": false,
+        "err_msg": ""
+    },
+    
+    "output_folder": "{timestamp}stce3_pcb_15vRW_600SEC_3"
+}

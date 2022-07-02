@@ -97,9 +97,19 @@ class Run(T.Thread):
             for Period in Periods:
                 for Vf_prof in Vf_prof_arr:
                     for Duty_cycle in Duty_cycles:
+
                         Tr = Duty_cycle * Period
                         Tf = (1-Duty_cycle) * Period
                         print("Start with Vr_prof: {} Vf_prof: {} Tr: {} Tf: {}".format(Vr_prof, Vf_prof, Tr, Tf))
+
+                        # IF PULSE
+                        if self.conf["ispulseused"] :
+                            current_conf = self.conf["smu_custom_pars"] 
+                            current_conf["pulsevoltage"] = Vf_prof
+                            current_conf["basevoltage"] = Vr_prof
+                            current_conf["pulsewidth"] = Tf
+                            current_conf["period"] = Period
+                            smu.configure(current_conf)
 
                         for p_iter, pixel in enumerate(self.conf["pixel_loop"]["loop"]):
                             self.current_pixel = pixel
@@ -114,45 +124,57 @@ class Run(T.Thread):
                             with open("{}/{}{}_TimeStep-{}_Vf-{}_Duty-{}.txt".format(self.outputfolder, pixel["ext"], pixel["inn"], Period, Vf_prof, Duty_cycle), 'a') as f:
                                 print("#pixel_time[s]\tV[V]\tI[A]",file=f)
                                 while time.time() - pixel_start_time < self.conf["smu_t_total"]:
-                                    for v_iter,volt_norm in enumerate(np.array(self.conf["smu_v_profile"])):
-                                        volt = Vf_prof if volt_norm == 1 else (Vr_prof if volt_norm == -1 else 0) 
-                                        smu.applyV(volt)
-                                        time_to_sleep = Tf if volt_norm == 1 else (Tr if volt_norm == -1 else Period) 
-                                        time.sleep(time_to_sleep)
-                                        real_v,i = smu.measureVI()
-                                        print("{}\t{}\t{}".format(time.time()-pixel_start_time, real_v, i), file=f)
-                                        print(volt,time_to_sleep)
-                                        if (self._stop_event.is_set()):
-                                            stop_run_flag = True
-                                            break
-                                        # if self.conf["smu_recovery_enable"] and (i > self.conf["smu_rec_thresh"]):
-                                        #     break
+                                    if self.conf["ispulseused"]:
+                                        data = smu.measureVI()
+                                        for line in range(data.shape[0]):
+                                            print("{}\t{}\t{}".format(data[line,2], data[line,0], data[line,1]), file=f)        
                                     else:
-                                        smu.applyV(0)
-                                        continue
-                                    break
+                                        for v_iter,volt_norm in enumerate(np.array(self.conf["smu_v_profile"])):
+                                        
+                                            volt = Vf_prof if volt_norm == 1 else (Vr_prof if volt_norm == -1 else 0) 
+                                            smu.applyV(volt)
+                                            time_to_sleep = Tf if volt_norm == 1 else (Tr if volt_norm == -1 else Period) 
+                                            time.sleep(time_to_sleep)
+                                            real_v,i = smu.measureVI()
+                                            print("{}\t{}\t{}".format(time.time()-pixel_start_time, real_v, i), file=f)
+                                            print(volt,time_to_sleep)
+                                            if (self._stop_event.is_set()):
+                                                stop_run_flag = True
+                                                break
+                                            # if self.conf["smu_recovery_enable"] and (i > self.conf["smu_rec_thresh"]):
+                                            #     break
+                                        else:
+                                            smu.applyV(0)
+                                            continue
+                                        break
                                 else:
                                     print("Recovery")
                                 if stop_run_flag:
                                     break
                                 # RECOVERY
-                                # print("RECOVERY")
+                                print("RECOVERY")
+                                smu.configure(self.conf["smu_custom_pars_rec"])
                                 recovery_start_time = time.time()
                                 while time.time() - recovery_start_time < self.conf["smu_t_total_rec"]:
-                                    for v_iter,volt in enumerate(np.array(self.conf["smu_v_profile_rec"])* self.conf["smu_v_factor_rec"]):
-                                        smu.applyV(volt)
-                                        time.sleep(self.conf["smu_t_step_rec"])
-                                        real_v,i = smu.measureVI()
-                                        print("{}\t{}\t{}".format(time.time()-pixel_start_time, real_v, i), file=f)
-                                        self.update_signal_chart(real_v,i, p_iter, newpixel_flag)
-                                        newpixel_flag = False
-                                        if (self._stop_event.is_set()):
-                                            stop_run_flag = True
-                                            break
+                                    if self.conf["ispulseused"]:
+                                        data = smu.measureVI()
+                                        for line in range(data.shape[0]):
+                                            print("{}\t{}\t{}".format(data[line,2], data[line,0], data[line,1]), file=f)        
                                     else:
-                                        smu.applyV(0)
-                                        continue
-                                    break
+                                        for v_iter,volt in enumerate(np.array(self.conf["smu_v_profile_rec"])* self.conf["smu_v_factor_rec"]):
+                                            smu.applyV(volt)
+                                            time.sleep(self.conf["smu_t_step_rec"])
+                                            real_v,i = smu.measureVI()
+                                            print("{}\t{}\t{}".format(time.time()-pixel_start_time, real_v, i), file=f)
+                                            self.update_signal_chart(real_v,i, p_iter, newpixel_flag)
+                                            newpixel_flag = False
+                                            if (self._stop_event.is_set()):
+                                                stop_run_flag = True
+                                                break
+                                        else:
+                                            smu.applyV(0)
+                                            continue
+                                        break
                                 else:
                                     continue
                                 break
