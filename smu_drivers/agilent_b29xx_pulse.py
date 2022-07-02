@@ -63,8 +63,7 @@ STAT:OPER:PTR 7020
 STAT:OPER:NTR 7020
 STAT:OPER:ENAB 7020
 *SRE 128
-SYST:TIME:TIM:COUN:RES:AUTO ON
-SYST:TIME:TIM:COUN:RES"""
+SYST:TIME:TIM:COUN:RES:AUTO OFF"""
 
     parameters = {
         "nplc": {
@@ -75,7 +74,7 @@ SYST:TIME:TIM:COUN:RES"""
         }
     }
 
-    def checkerror(self):
+    def checkerror(self, suppress_exception = False):
         err = self.inst.query('SYST:ERR:COUN?')
         if (err != '+0'):
             numbers = int(err[1:])
@@ -83,7 +82,10 @@ SYST:TIME:TIM:COUN:RES"""
             for err_n in range(numbers):
                 print("Error ", err_n, ":")
                 print(self.inst.query("SYST:ERR?"))
-            raise Exception("SMU Exception")
+            if not suppress_exception:
+                raise Exception("SMU Exception")
+            else:
+                print("SMU errors were suppressed")
 
     def sendcmd(self, cmd):
         self.inst.write(cmd)
@@ -120,12 +122,13 @@ SYST:TIME:TIM:COUN:RES"""
         resp = self.inst.read().strip()
         assert resp != "", "Invalid SMU responce"
         print("SMU connected: ", resp)
+        self.checkerror(True)
 
     def applyV(self, v):
         raise Exception("This function should not be called: applyV(self,v)")
 
-    def configure(self, custom_parameters={}):
-        custom_parameters["measpoints"] = int(float(custom_parameters["period"])/float(custom_parameters["measinterval"]))
+    def configure(self, custom_parameters={}, reset_time=True):
+        custom_parameters["measpoints"] = {"value": int(float(custom_parameters["period"]["value"])/float(custom_parameters["measinterval"]["value"]))}
         for k,v in custom_parameters.items():
             setattr(self, k, v['value'])
         self.channel = int(self.channel)
@@ -145,8 +148,12 @@ SYST:TIME:TIM:COUN:RES"""
             repeat = self.repeat
         ) 
 
+        self.inst.timeout = int(self.repeat) * float(self.period) * 1000 * 50 + 10000 
+
         for cmd in start_measurement_cmd.split("\n"):
             self.sendcmd(cmd)
+        if reset_time:
+            self.sendcmd("SYST:TIME:TIM:COUN:RES")
         
     def measureVI(self):
         data = []

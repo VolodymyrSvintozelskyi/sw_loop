@@ -91,7 +91,7 @@ class Run(T.Thread):
             Vr_prof = self.conf["Vr_prof"]
             Vf_prof_arr = self.conf["Vf_prof_arr"]   # generate array from 0 to 1 (incl) with 0.25 step
             Duty_cycles = self.conf["Duty_cycles"]  # Tr/Tf
-            Periods = self.conf["smu_t_step_arr"]
+            Periods = self.conf["smu_periods_arr"]
             
 
             for Period in Periods:
@@ -105,10 +105,10 @@ class Run(T.Thread):
                         # IF PULSE
                         if self.conf["ispulseused"] :
                             current_conf = self.conf["smu_custom_pars"] 
-                            current_conf["pulsevoltage"] = Vf_prof
-                            current_conf["basevoltage"] = Vr_prof
-                            current_conf["pulsewidth"] = Tf
-                            current_conf["period"] = Period
+                            current_conf["pulsevoltage"] = {"value": Vf_prof}
+                            current_conf["basevoltage"] = {"value": Vr_prof}
+                            current_conf["pulsewidth"] = {"value": Tf}
+                            current_conf["period"] = {"value": Period}
                             smu.configure(current_conf)
 
                         for p_iter, pixel in enumerate(self.conf["pixel_loop"]["loop"]):
@@ -153,7 +153,7 @@ class Run(T.Thread):
                                     break
                                 # RECOVERY
                                 print("RECOVERY")
-                                smu.configure(self.conf["smu_custom_pars_rec"])
+                                smu.configure(self.conf["smu_custom_pars_rec"], False)
                                 recovery_start_time = time.time()
                                 while time.time() - recovery_start_time < self.conf["smu_t_total_rec"]:
                                     if self.conf["ispulseused"]:
