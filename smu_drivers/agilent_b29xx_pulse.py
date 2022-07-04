@@ -46,14 +46,11 @@ SENS{ch}:FUNC:ON "CURR"
 SENS{ch}:CURR:APER:AUTO OFF
 SENS{ch}:CURR:NPLC {nplc}
 SENS{ch}:CURR:RANG:AUTO ON
-SENS{ch}:VOLT:RANG:AUTO:LLIM 1e-6
+SENS{ch}:CURR:RANG:AUTO:LLIM 1e-6
 
 TRIG{ch}:ACQ:DEL {measdelay}
 
 SENS{ch}:REM OFF
-
-SENS{ch}:CURR:RANG {meascurrrange}
-
 OUTP{ch}:HCAP OFF
 
 SENS{ch}:VOLT:RANG:AUTO:MODE NORM
@@ -67,7 +64,7 @@ OUTP{ch}:FILT:TCON 5e-06
 
 SOUR{ch}:WAIT:GAIN 1
 SOUR{ch}:WAIT:OFFS 0
-SENS{ch}:WAIT:GAIN 0
+SENS{ch}:WAIT:GAIN 1
 SENS{ch}:WAIT:OFFS 0
 
 SOUR{ch}:FUNC:TRIG:CONT OFF
@@ -188,7 +185,7 @@ SYST:TIME:TIM:COUN:RES:AUTO ON
             pulsewidth = self.pulsewidth,
             compliance = self.compliance,
             nplc = self.nplc,
-            meascurrrange = self.meascurrrange,
+            # meascurrrange = self.meascurrrange,
             # meashold = self.meashold,
             # measpoints = self.measpoints,
             # period = self.period,
@@ -198,7 +195,7 @@ SYST:TIME:TIM:COUN:RES:AUTO ON
             var1count = self.var1count
         ) 
 
-        self.inst.timeout = int(self.repeat) * float(self.period) * 1000 * 50 + 10000 
+        self.inst.timeout = int(self.repeat) * int(self.var1count) * (float(self.pulsewidth) + float(self.pulsedelay)) * 1000 * 50 + 10000 
 
         for cmd in start_measurement_cmd.split("\n"):
             self.sendcmd(cmd)

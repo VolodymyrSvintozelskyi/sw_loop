@@ -12,14 +12,8 @@
         "channel": {
             "value": "1"
         },
-        "pulsedelay": {
-            "value": "0"
-        },
         "compliance": {
             "value": "0.01"
-        },
-        "meascurrrange": {
-            "value": "1"
         },
         "repeat":{
             "value": 50
@@ -44,9 +38,6 @@
         },
         "compliance": {
             "value": "0.01"
-        },
-        "meascurrrange": {
-            "value": "1"
         },
         "repeat":{
             "value": 50
