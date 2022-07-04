@@ -11,12 +11,14 @@ SOUR{ch}:VOLT:RANG:AUTO ON
 """
 
     start_measurement_cmd_set = """
+SOUR{ch}:WAIT:AUTO ON
+SENS{ch}:WAIT:AUTO ON
+
 CALC{ch}:MATH:STAT off
 CALC{ch}:CLIM:STAT OFF
 SENS{ch}:RES:MODE MAN
+SOURCE{ch}:SWE:RANG AUTO
 SOURCE{ch}:VOLT:RANG:AUTO on
-
-SOURCE{ch}:VOLT:MODE FIX
 SOURCE{ch}:FUNC PULS
 SOURCE{ch}:VOLT {basevoltage}
 SOURCE{ch}:VOLT:TRIG {pulsevoltage}
@@ -24,46 +26,92 @@ SOUR{ch}:PULS:DEL {pulsedelay}
 SOUR{ch}:PULS:WIDT {pulsewidth}
 SENS{ch}:CURR:PROT {compliance}
 SOUR{ch}:FUNC:MODE VOLT
+SOURCE{ch}:VOLT:MODE FIX
+TRIG{ch}:TRAN:DEL {measdelay}
+
 FORM REAL,64
 FORM:BORD NORM
 FORM:ELEM:SENS VOLT,CURR,TIME
+
 SENS{ch}:FUNC:OFF:ALL
 SENS{ch}:FUNC:ON "VOLT"
 SENS{ch}:VOLT:APER:AUTO OFF
 SENS{ch}:VOLT:NPLC {nplc}
+SENS{ch}:VOLT:RANG:AUTO ON
+SENS{ch}:VOLT:RANG:AUTO:LLIM MIN
+
+TRIG{ch}:ACQ:DEL {measdelay}
+
 SENS{ch}:FUNC:ON "CURR"
 SENS{ch}:CURR:APER:AUTO OFF
 SENS{ch}:CURR:NPLC {nplc}
-SENS{ch}:CURR:RANG:AUTO OFF
-SENS{ch}:CURR:RANG {meascurrrange}
+SENS{ch}:CURR:RANG:AUTO ON
+SENS{ch}:VOLT:RANG:AUTO:LLIM 1e-6
+
+TRIG{ch}:ACQ:DEL {measdelay}
+
 SENS{ch}:REM OFF
+
+SENS{ch}:CURR:RANG {meascurrrange}
+
 OUTP{ch}:HCAP OFF
+
+SENS{ch}:VOLT:RANG:AUTO:MODE NORM
+SENS{ch}:CURR:RANG:AUTO:MODE NORM
+SENS{ch}:VOLT:RANG:AUTO:THR 90
+SENS{ch}:CURR:RANG:AUTO:THR 90
+
 OUTP{ch}:FILT ON
 OUTP{ch}:FILT:AUTO OFF
 OUTP{ch}:FILT:TCON 5e-06
+
+SOUR{ch}:WAIT:GAIN 1
+SOUR{ch}:WAIT:OFFS 0
+SENS{ch}:WAIT:GAIN 0
+SENS{ch}:WAIT:OFFS 0
+
 SOUR{ch}:FUNC:TRIG:CONT OFF
+
 ARM{ch}:ALL:COUN {repeat}
-ARM{ch}:ACQ:DEL {meashold}
-ARM{ch}:TRAN:DEL 0
+ARM{ch}:ALL:DEL 0
 ARM{ch}:LXI:LAN:DIS:ALL
 ARM{ch}:ALL:SOUR AINT
 ARM{ch}:ALL:TIM MIN
-TRIG{ch}:TRAN:COUN 2
-TRIG{ch}:ACQ:COUN {measpoints}
-TRIG{ch}:TRAN:DEL 0.01
-TRIG{ch}:ACQ:DEL 0
-TRIG{ch}:TRAN:SOUR TIM
-TRIG{ch}:TRAN:TIM {period}
-TRIG{ch}:ACQ:SOUR TIM
-TRIG{ch}:ACQ:TIM {measinterval}
-SOUR{ch}:WAIT OFF
-SENS{ch}:WAIT OFF
+TRIG{ch}:ALL:COUN {var1count}
+TRIG{ch}:LXI:LAN:DIS:ALL
+TRIG{ch}:ALL:SOUR AINT
+TRIG{ch}:ALL:TIM MIN
+
+SOUR{ch}:WAIT ON
+SENS{ch}:WAIT ON
 OUTP{ch}:STAT ON
 STAT:OPER:PTR 7020
 STAT:OPER:NTR 7020
 STAT:OPER:ENAB 7020
 *SRE 128
-SYST:TIME:TIM:COUN:RES:AUTO OFF"""
+SYST:TIME:TIM:COUN:RES:AUTO ON
+
+"""
+
+
+# ARM{ch}:ACQ:DEL {meashold}
+# ARM{ch}:TRAN:DEL 0
+
+
+
+# TRIG{ch}:TRAN:COUN 2
+# TRIG{ch}:ACQ:COUN {measpoints}
+# TRIG{ch}:TRAN:DEL 0.01
+
+# TRIG{ch}:TRAN:SOUR TIM
+# TRIG{ch}:TRAN:TIM {period}
+# TRIG{ch}:ACQ:SOUR TIM
+# TRIG{ch}:ACQ:TIM {measinterval}
+# SOUR{ch}:WAIT OFF
+# SENS{ch}:WAIT OFF
+
+
+
 
     parameters = {
         "nplc": {
@@ -128,7 +176,7 @@ SYST:TIME:TIM:COUN:RES:AUTO OFF"""
         raise Exception("This function should not be called: applyV(self,v)")
 
     def configure(self, custom_parameters={}, reset_time=True):
-        custom_parameters["measpoints"] = {"value": int(float(custom_parameters["period"]["value"])/float(custom_parameters["measinterval"]["value"]))}
+        # custom_parameters["measpoints"] = {"value": int(float(custom_parameters["period"]["value"])/float(custom_parameters["measinterval"]["value"]))}
         for k,v in custom_parameters.items():
             setattr(self, k, v['value'])
         self.channel = int(self.channel)
@@ -141,11 +189,13 @@ SYST:TIME:TIM:COUN:RES:AUTO OFF"""
             compliance = self.compliance,
             nplc = self.nplc,
             meascurrrange = self.meascurrrange,
-            meashold = self.meashold,
-            measpoints = self.measpoints,
-            period = self.period,
-            measinterval = self.measinterval,
-            repeat = self.repeat
+            # meashold = self.meashold,
+            # measpoints = self.measpoints,
+            # period = self.period,
+            # measinterval = self.measinterval,
+            repeat = self.repeat,
+            measdelay = self.measdelay,
+            var1count = self.var1count
         ) 
 
         self.inst.timeout = int(self.repeat) * float(self.period) * 1000 * 50 + 10000 

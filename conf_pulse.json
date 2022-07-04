@@ -21,14 +21,14 @@
         "meascurrrange": {
             "value": "1"
         },
-        "meashold": {
-            "value": "0"
-        },
-        "measinterval": {
-            "value": "0.1"
-        },
         "repeat":{
             "value": 50
+        },
+        "measdelay":{
+            "value": 0
+        },
+        "var1count":{
+            "value": 100000
         }
     },
     "smu_t_total_rec": 60,
@@ -48,12 +48,6 @@
         "meascurrrange": {
             "value": "1"
         },
-        "meashold": {
-            "value": "0"
-        },
-        "measinterval": {
-            "value": "0.1"
-        },
         "repeat":{
             "value": 50
         },
@@ -66,8 +60,11 @@
         "pulsewidth": {
             "value": 0.5
         },
-        "period": {
-            "value": 1
+        "measdelay":{
+            "value": 0
+        },
+        "var1count":{
+            "value": 100000
         }
     },
     "smu_recovery_enable": true,

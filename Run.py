@@ -108,7 +108,8 @@ class Run(T.Thread):
                             current_conf["pulsevoltage"] = {"value": Vf_prof}
                             current_conf["basevoltage"] = {"value": Vr_prof}
                             current_conf["pulsewidth"] = {"value": Tf}
-                            current_conf["period"] = {"value": Period}
+                            # current_conf["period"] = {"value": Period}
+                            current_conf["pulsedelay"] = {"value": Period - Tf}
                             smu.configure(current_conf)
 
                         for p_iter, pixel in enumerate(self.conf["pixel_loop"]["loop"]):
